@@ -1,5 +1,6 @@
 import jsonService from '../../../../cli/services/json';
 import pageFoldService from '@scripts/services/page-fold';
+import reactComponentBuilder from '@scripts/services/react-component-builder';
 import vueComponentBuilder from '@scripts/services/vue-component-builder';
 import vanillaComponentBuilder from '@scripts/services/vanilla-component-builder';
 import template from './external-component-preview.html';
@@ -23,7 +24,7 @@ function controller($scope, $timeout, $element, angularComponentBuilder){
     return !$ctrl.rendered ? render(angular.copy($ctrl.example)) : null;
   }
 
-  function render(example){
+  function render(example) {
     buildComponent($ctrl.engine, jsonService.parseFunctions(example));
     handleExampleStyles(getExampleStyles(example));
     unsubscribeFromPageFoldService($ctrl.pageFoldSubscriptionId);
@@ -40,6 +41,8 @@ function controller($scope, $timeout, $element, angularComponentBuilder){
     switch (engine) {
     case 'angular':
       return handleAngularComponent(component);
+    case 'react':
+      return handleReactComponent(component);
     case 'vue':
       return handleVueComponent(component);
     case 'vanilla':
@@ -50,6 +53,10 @@ function controller($scope, $timeout, $element, angularComponentBuilder){
   function handleAngularComponent(component){
     const element = angularComponentBuilder.build(component, $scope);
     $element.find('div').append(element);
+  }
+
+  function handleReactComponent(component) {
+    reactComponentBuilder.build(component, $element.find('div')[0]);
   }
 
   function handleVueComponent(component){
