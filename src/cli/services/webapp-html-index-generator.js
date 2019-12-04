@@ -13,7 +13,7 @@ _public.init = ({ scripts, styles, custom, projects = [] } = {}) => {
     const scriptTags = buildAssetTags(scripts, buildScriptTag);
     const indexHtml = webappHtmlIndexCustomisation.init(buildIndexHtml(
       linkTags,
-      handleVueScriptsTag(scriptTags, projects),
+      handleExternalScriptsTag(scriptTags, projects),
       buildComponentEngineScriptTag('angular.js', pkg.devDependencies.angular.replace('^', ''))
     ), custom);
     fileService.write(path.join(__dirname, '../../webapp/index.html'), indexHtml, resolve, reject);
@@ -36,18 +36,32 @@ function buildScriptTag(path){
   return `<script src="${buildExternalAssetPath(path)}?t=${Date.now()}"></script>`;
 }
 
-function handleVueScriptsTag(scriptTags, projects){
-  const vueProject = getVueProject(projects);
-  return vueProject ? prependVueScriptTag(scriptTags, vueProject) : scriptTags;
+function handleExternalScriptsTag(scriptTags, projects) {
+  const externalScriptsTag = [];
+  projects.forEach(project => {
+    if (project.engine == 'vue') {
+      externalScriptsTag.push(prependVueScriptTag(scriptTags, project));
+    }
+    if (project.engine == 'react') {
+      return;
+    }
+  });
+
+  return externalScriptsTag.length ? externalScriptsTag : scriptTags;
 }
 
-function getVueProject(projects){
-  for (var i = 0; i < projects.length; i++)
-    if(projects[i].engine == 'vue')
-      return projects[i];
-}
+// function handleVueScriptsTag(scriptTags, projects){
+//   const vueProject = getVueProject(projects);
+//   return vueProject ? prependVueScriptTag(scriptTags, vueProject) : scriptTags;
+// }
 
-function prependVueScriptTag(scriptTags, vueProject){
+// function getVueProject(projects){
+//   for (var i = 0; i < projects.length; i++)
+//     if(projects[i].engine == 'vue')
+//       return projects[i];
+// }
+
+function prependVueScriptTag(scriptTags, vueProject) {
   scriptTags.unshift(buildComponentEngineScriptTag('vue', (vueProject.version || '2.5.13')));
   return scriptTags;
 }
@@ -73,7 +87,8 @@ function parseRelativePath(path){
   return path.indexOf('./') === 0 ? path.replace('./','') : path;
 }
 
-function buildIndexHtml(linkTags, scriptTags, angularScriptTag){
+// eslint-disable-next-line max-statements
+function buildIndexHtml(linkTags, scriptTags, angularScriptTag) {
   const template = getIndexHtmlTemplate();
   let html = injectExternalTagsOnIndex(template, 'external-links', linkTags);
   html = injectExternalTagsOnIndex(html, 'angular', angularScriptTag);
