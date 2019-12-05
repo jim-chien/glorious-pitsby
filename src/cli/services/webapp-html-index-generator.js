@@ -37,33 +37,16 @@ function buildScriptTag(path){
 }
 
 function handleExternalScriptsTag(scriptTags, projects) {
-  const externalScriptsTag = [];
+  const externalScriptsTag = [...scriptTags];
   projects.forEach(project => {
     if (project.engine == 'vue') {
-      externalScriptsTag.push(prependVueScriptTag(scriptTags, project));
+      externalScriptsTag.unshift(buildComponentEngineScriptTag('vue', (project.version || '2.5.13')));
     }
     if (project.engine == 'react') {
       return;
     }
   });
-
-  return externalScriptsTag.length ? externalScriptsTag : scriptTags;
-}
-
-// function handleVueScriptsTag(scriptTags, projects){
-//   const vueProject = getVueProject(projects);
-//   return vueProject ? prependVueScriptTag(scriptTags, vueProject) : scriptTags;
-// }
-
-// function getVueProject(projects){
-//   for (var i = 0; i < projects.length; i++)
-//     if(projects[i].engine == 'vue')
-//       return projects[i];
-// }
-
-function prependVueScriptTag(scriptTags, vueProject) {
-  scriptTags.unshift(buildComponentEngineScriptTag('vue', (vueProject.version || '2.5.13')));
-  return scriptTags;
+  return externalScriptsTag;
 }
 
 function buildComponentEngineScriptTag(engine, version){
@@ -87,7 +70,6 @@ function parseRelativePath(path){
   return path.indexOf('./') === 0 ? path.replace('./','') : path;
 }
 
-// eslint-disable-next-line max-statements
 function buildIndexHtml(linkTags, scriptTags, angularScriptTag) {
   const template = getIndexHtmlTemplate();
   let html = injectExternalTagsOnIndex(template, 'external-links', linkTags);
