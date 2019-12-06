@@ -43,16 +43,17 @@ function handleExternalScriptsTag(scriptTags, projects) {
       externalScriptsTag.unshift(buildComponentEngineScriptTag('vue', (project.version || '2.5.13')));
     }
     if (project.engine == 'react') {
-      return;
+      externalScriptsTag.unshift(buildComponentEngineScriptTag('react', (project.version || '16.12.0')));
+      externalScriptsTag.unshift(buildComponentEngineScriptTag('react-dom', (project.version || '16.12.0')));
     }
   });
   return externalScriptsTag;
 }
 
-function buildComponentEngineScriptTag(engine, version){
+function buildComponentEngineScriptTag(engine, version, prefix){
   const cdnUrl = `https://cdnjs.cloudflare.com/ajax/libs/${engine}`;
   const file = buildComponentEngineFileName(engine);
-  return `<script src="${cdnUrl}/${version}/${file}"></script>`;
+  return prefix ? `<script src="${cdnUrl}/${version}/${prefix}/${file}"></script>` : `<script src="${cdnUrl}/${version}/${file}"></script>`;
 }
 
 function buildComponentEngineFileName(engine){
