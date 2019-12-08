@@ -40,20 +40,41 @@ function handleExternalScriptsTag(scriptTags, projects) {
   const externalScriptsTag = [...scriptTags];
   projects.forEach(project => {
     if (project.engine == 'vue') {
-      externalScriptsTag.unshift(buildComponentEngineScriptTag('vue', (project.version || '2.5.13')));
+      externalScriptsTag.unshift(buildVueScriptTag(project.version));
     }
     if (project.engine == 'react') {
-      externalScriptsTag.unshift(buildComponentEngineScriptTag('react', (project.version || '16.12.0')));
-      externalScriptsTag.unshift(buildComponentEngineScriptTag('react-dom', (project.version || '16.12.0')));
+      externalScriptsTag.unshift(buildReactScriptTag(project.version),
+        buildReactDomScriptTag(project.version));
     }
   });
   return externalScriptsTag;
 }
 
+function buildVueScriptTag(vueVersion = '2.5.13') {
+  return buildComponentEngineScriptTag('vue', vueVersion);
+}
+
+function buildReactScriptTag(reactVersion = '16.11.0') {
+  const reactScriptTag = buildComponentEngineScriptTag('react', reactVersion, 'umd');
+  const suffix = processService.getNodeEnv() == 'production' ?
+    '.production.min.js' : '.development.js';
+  return reactScriptTag.replace('.js', suffix);
+}
+
+function buildReactDomScriptTag(reactVersion = '16.11.0') {
+  const reactDomScriptTag =
+    buildComponentEngineScriptTag('react-dom', reactVersion, 'umd');
+  const suffix = processService.getNodeEnv() == 'production' ?
+    '.production.min.js' : '.development.js';
+  return reactDomScriptTag.replace('.js', suffix);
+}
+
 function buildComponentEngineScriptTag(engine, version, prefix){
   const cdnUrl = `https://cdnjs.cloudflare.com/ajax/libs/${engine}`;
   const file = buildComponentEngineFileName(engine);
-  return prefix ? `<script src="${cdnUrl}/${version}/${prefix}/${file}"></script>` : `<script src="${cdnUrl}/${version}/${file}"></script>`;
+  return prefix ?
+    `<script src="${cdnUrl}/${version}/${prefix}/${file}"></script>`
+    : `<script src="${cdnUrl}/${version}/${file}"></script>`;
 }
 
 function buildComponentEngineFileName(engine){
