@@ -38,6 +38,7 @@
   "dependencies": {
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
+    "@babel/standalone": "^7.7.6",
     "@uirouter/angularjs": "^1.0.20",
     "axios": "^0.18.1",
     "babel-jest": "^25.0.0",

@@ -96,6 +96,7 @@ function buildIndexHtml(linkTags, scriptTags, angularScriptTag) {
   const template = getIndexHtmlTemplate();
   let html = injectExternalTagsOnIndex(template, 'external-links', linkTags);
   html = injectExternalTagsOnIndex(html, 'angular', angularScriptTag);
+  scriptTags.unshift('<script src="https://unpkg.com/@babel/standalone@7.7.6/babel.min.js"></script>');
   html = injectExternalTagsOnIndex(html, 'external-scripts', scriptTags);
   return clearBlankLines(html);
 }
